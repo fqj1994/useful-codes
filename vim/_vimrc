@@ -1,0 +1,105 @@
+" 
+" $File: .vimrc
+" $Date: Tue Mar 02 19:58:10 2010 +0800
+" $Author: Jiakai <gy_jk@126.com>
+"
+" a useful vimrc file
+"
+
+" Use Vim settings, rather then Vi settings (much better!).
+" This must be first, because it changes other options as a side effect.
+set nocompatible
+
+" Ensure all autocommands, functions and commands are included only once
+if !exists("header_protecter")
+	let header_protecter = 1
+
+	" Automatically updates the time and date in the head of the file
+	autocmd BufWritePre,FileWritePre *   ks|call LastMod()|'s
+	fun LastMod()
+		let l = line("$")
+		if l > 10
+			let l = 10
+		endif
+		execute '1,' . l . 'substitute/' . '^\(.*\$Date:\).*$' . '/\1 ' . strftime('%a %b %d %H:%M:%S %Y %z') . '/e'
+		execute '1,' . l . 'substitute/' . '^\(.*\$File:\).*$' . '/\1 ' . expand('<afile>:t') . '/e'
+	endfun
+
+	" Enable file type detection.
+	" Use the default filetype settings, so that mail gets 'tw' set to 72,
+	" 'cindent' is on in C files, etc.
+	" Also load indent files, to automatically do language-dependent indenting.
+	filetype plugin indent on
+
+	" For all text files set 'textwidth' to 78 characters.
+	autocmd FileType text setlocal textwidth=78
+
+	" When editing a file, always jump to the last known cursor position.
+	" Don't do it when the position is invalid or when inside an event handler
+	" (happens when dropping a file on gvim).
+	autocmd BufReadPost *
+				\ if line("'\"") > 0 && line("'\"") <= line("$") |
+				\   exe "normal g`\"" |
+				\ endif
+
+	" set :make and some commands
+	let &makeprg="g++ % -O2 -o %:r -Wall"
+
+	fun Make_arg(arg, ...)
+		let makeprg0 = &makeprg
+		let &makeprg = a:arg
+		for s in a:000
+			let &makeprg .= " " . s
+		endfor
+		make
+		let &makeprg = makeprg0
+	endfun
+	command -nargs=* Makegdb call Make_arg("g++ % -o %:r -ggdb -Wall", <f-args>)
+	command -nargs=* Makepg call Make_arg("g++ % -o %:r -pg -Wall", <f-args>)
+	command -nargs=* TryCompile call Make_arg("g++ % -o /tmp/vim_try_compile -Wall -c", <f-args>)
+
+endif
+
+" allow backspacing over everything in insert mode
+set backspace=indent,eol,start
+syntax on
+" set autoindent        " always set autoindenting on
+set smartindent
+if has("vms")
+	set nobackup        " do not keep a backup file, use versions instead
+else
+	set backup        " keep a backup file
+endif
+set history=50        " keep 50 lines of command line history
+set ruler        " show the cursor position all the time
+set showcmd        " display incomplete commands
+set incsearch        " do incremental searching
+
+set number
+set shiftwidth=4
+set softtabstop=4
+set tabstop=4
+set fileencodings=ucs-bom,utf-8,gb2312,gbk
+set guifont=Monospace\ 16
+set nobk
+
+" Make p in Visual mode replace the selected text with the "" register.
+vnoremap p :let current_reg = @"gvs=current_reg
+
+" This is an alternative that also works in block mode, but the deleted
+" text is lost and it only works for putting the current register.
+"vnoremap p "_dp
+
+" Switch syntax highlighting on, when the terminal has colors
+" Also switch on highlighting the last used search pattern.
+if &t_Co > 2 || has("gui_running")
+	syntax on
+	set hlsearch
+endif
+
+" vimgdb setting
+run macros/gdb_mappings.vim 
+
+" Show current date and time when pressing <F2>
+map <F2> :!date <CR>
+
