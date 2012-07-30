@@ -1,0 +1,35 @@
+#!/usr/bin/env python
+# coding: utf-8
+import urllib2
+import urllib
+import sys
+import time
+def to_oct(i):
+    t = oct(i)
+    return '\\' + t[1:]
+if len(sys.argv) == 3:
+    station_utf8 = sys.argv[1]
+    train_number = sys.argv[2]
+    station_gbk = sys.argv[1].decode('utf-8').encode('gbk')
+    t = time.localtime()
+    d = '%d-%d-%d' % (t.tm_year, t.tm_mon, t.tm_mday)
+    req = urllib2.Request('http://dynamic.12306.cn/map_zwdcx/cx.jsp?cz=%s&cc=%s&cxlx=0&rq=%s&czEn=%s' % (
+        ''.join([to_oct(ord(i)) for i in station_gbk]),
+        train_number,
+        d,
+        urllib.quote(station_utf8).replace('%', '-')
+        ))
+    m = urllib2.urlopen(req, timeout = 20)
+    print m.read().decode('gbk').replace('\n','')
+    req = urllib2.Request('http://dynamic.12306.cn/map_zwdcx/cx.jsp?cz=%s&cc=%s&cxlx=1&rq=%s&czEn=%s' % (
+        ''.join([to_oct(ord(i)) for i in station_gbk]),
+        train_number,
+        d,
+        urllib.quote(station_utf8).replace('%', '-')
+        ))
+    m = urllib2.urlopen(req, timeout = 20)
+    print m.read().decode('gbk').replace('\n', '')
+
+else:
+    print 'Usage: '
+    print sys.argv[0], 'Station', 'TrainNumber'
