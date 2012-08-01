@@ -83,15 +83,15 @@ import time
 def duration_to_str(duration):
     s = ''
     if duration == 0:
-        return '0秒'
+        return u'0秒'
     if duration >= 3600:
-        s += '%d小时' % (duration / 3600)
+        s += u'%d小时' % (duration / 3600)
         duration /= 3600
     if duration > 60:
-        s += '%d分' % (duration / 60)
+        s += u'%d分' % (duration / 60)
         duration %= 60
     if duration > 0:
-        s += '%d秒' % (duration)
+        s += u'%d秒' % (duration)
     return s
 
 
