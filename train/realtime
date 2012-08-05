@@ -12,7 +12,7 @@ if len(sys.argv) == 3:
     train_number = sys.argv[2]
     station_gbk = sys.argv[1].decode('utf-8').encode('gbk')
     t = time.localtime()
-    d = '%d-%d-%d' % (t.tm_year, t.tm_mon, t.tm_mday)
+    d = '%04d-%02d-%02d' % (t.tm_year, t.tm_mon, t.tm_mday)
     req = urllib2.Request('http://dynamic.12306.cn/map_zwdcx/cx.jsp?cz=%s&cc=%s&cxlx=0&rq=%s&czEn=%s' % (
         ''.join([to_oct(ord(i)) for i in station_gbk]),
         train_number,
